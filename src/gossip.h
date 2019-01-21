@@ -44,8 +44,8 @@ typedef enum pittacus_gossip_state {
  * @param buffer_size a size of the data buffer.
  * @return Void.
  */
-typedef void (*data_receiver_t)(void *context, pittacus_gossip_t *gossip,
-                                const uint8_t *buffer, size_t buffer_size);
+typedef void (*data_receiver_t)(void *context, pittacus_gossip_t *gossip, const pt_sockaddr_storage *sender,
+                                pt_socklen_t sender_len, const uint8_t *buffer, size_t buffer_size);
 
 typedef struct pittacus_addr {
     const pt_sockaddr *addr; /**< pointer to the address instance. */
@@ -119,6 +119,18 @@ int pittacus_gossip_process_send(pittacus_gossip_t *self);
  * @return zero on success or negative value if the operation failed.
  */
 int pittacus_gossip_send_data(pittacus_gossip_t *self, const uint8_t *data, uint32_t data_size);
+
+/**
+ * Sends data to a specific connection within a gossip cluster.
+ *
+ * @param self a gossip descriptor instance.
+ * @param recipient is the receiver address.
+ * @param recipient_len is the receiver address len.
+ * @param data a payload.
+ * @param data_size a payload size.
+ * @return zero on success or negative value if the operation failed.
+ */
+int pittacus_gossip_data_sendto(pittacus_gossip_t *self, const pt_sockaddr_storage *recipient, pt_socklen_t recipient_len, const uint8_t *data, uint32_t data_size);
 
 /**
  * Processes the Gossip tick event.

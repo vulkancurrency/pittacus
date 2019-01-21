@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "gossip.h"
 #include "messages.h"
 #include "member.h"
@@ -408,6 +409,29 @@ static int gossip_enqueue_data(pittacus_gossip_t *self,
                                   NULL, 0, GOSSIP_RANDOM);
 }
 
+static int gossip_enqueue_data_sendto(pittacus_gossip_t *self,
+                                      const pt_sockaddr_storage *recipient,
+                                      pt_socklen_t recipient_len,
+                                      const uint8_t *data,
+                                      uint16_t data_size) {
+    // Update the local data version.
+    uint32_t clock_counter = ++self->data_counter;
+    vector_record_t *record = vector_clock_set(&self->data_version, &self->self_address,
+                                               clock_counter);
+
+    message_data_t data_msg;
+    message_header_init(&data_msg.header, MESSAGE_DATA_TYPE, 0);
+    vector_clock_record_copy(&data_msg.data_version, record);
+    data_msg.data = (uint8_t *) data;
+    data_msg.data_size = data_size;
+
+    // Add the data to our internal log.
+    gossip_data_log(&self->data_log, &data_msg);
+
+    return gossip_enqueue_message(self, MESSAGE_DATA_TYPE, &data_msg,
+                                  recipient, recipient_len, GOSSIP_DIRECT);
+}
+
 static int gossip_enqueue_status(pittacus_gossip_t *self,
                                  const pt_sockaddr_storage *recipient,
                                  pt_socklen_t recipient_len) {
@@ -575,7 +599,8 @@ static int gossip_handle_data(pittacus_gossip_t *self, const message_envelope_in
 
         if (self->data_receiver) {
             // Invoke the data receiver callback specified by the user.
-            self->data_receiver(self->data_receiver_context, self, msg.data, msg.data_size);
+            self->data_receiver(self->data_receiver_context, self, envelope_in->sender,
+              envelope_in->sender_len, msg.data, msg.data_size);
         }
         // Enqueue the same message to send it to N random members later.
         return gossip_enqueue_message(self, MESSAGE_DATA_TYPE, &msg, NULL, 0, GOSSIP_RANDOM);
@@ -833,6 +858,11 @@ int pittacus_gossip_process_send(pittacus_gossip_t *self) {
 int pittacus_gossip_send_data(pittacus_gossip_t *self, const uint8_t *data, uint32_t data_size) {
     RETURN_IF_NOT_CONNECTED(self->state);
     return gossip_enqueue_data(self, data, data_size);
+}
+
+int pittacus_gossip_data_sendto(pittacus_gossip_t *self, const pt_sockaddr_storage *recipient, pt_socklen_t recipient_len, const uint8_t *data, uint32_t data_size) {
+    RETURN_IF_NOT_CONNECTED(self->state);
+    return gossip_enqueue_data_sendto(self, data, data_size);
 }
 
 int pittacus_gossip_tick(pittacus_gossip_t *self) {
