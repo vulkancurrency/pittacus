@@ -862,7 +862,7 @@ int pittacus_gossip_send_data(pittacus_gossip_t *self, const uint8_t *data, uint
 
 int pittacus_gossip_data_sendto(pittacus_gossip_t *self, const pt_sockaddr_storage *recipient, pt_socklen_t recipient_len, const uint8_t *data, uint32_t data_size) {
     RETURN_IF_NOT_CONNECTED(self->state);
-    return gossip_enqueue_data_sendto(self, data, data_size);
+    return gossip_enqueue_data_sendto(self, recipient, recipient_len, data, data_size);
 }
 
 int pittacus_gossip_tick(pittacus_gossip_t *self) {
