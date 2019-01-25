@@ -41,7 +41,7 @@ extern "C" {
 
 #ifndef MESSAGE_MAX_SIZE
 /** The maximum supported size of the message including a protocol overhead. */
-#define MESSAGE_MAX_SIZE 512
+#define MESSAGE_MAX_SIZE 1024
 #endif
 
 #ifndef MAX_OUTPUT_MESSAGES
