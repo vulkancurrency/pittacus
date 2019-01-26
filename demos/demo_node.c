@@ -24,7 +24,7 @@
 
 const char DATA_MESSAGE[] = "Hello World";
 
-void data_receiver(void *context, pittacus_gossip_t *gossip, const uint8_t *data, size_t data_size) {
+void data_receiver(void *context, pittacus_gossip_t *gossip, const pt_sockaddr_storage *recipient, pt_socklen_t recipient_len, const uint8_t *data, size_t data_size) {
     // This function is invoked every time when a new data arrives.
     printf("Data arrived: %s\n", data);
 }
