@@ -31,22 +31,22 @@ extern "C" {
 
 #ifndef MESSAGE_RETRY_ATTEMPTS
 /** The maximum number of attempts to deliver a message. */
-#define MESSAGE_RETRY_ATTEMPTS 3
+#define MESSAGE_RETRY_ATTEMPTS 5
 #endif
 
 #ifndef MESSAGE_RUMOR_FACTOR
 /** The number of members that are used for further gossip propagation. */
-#define MESSAGE_RUMOR_FACTOR 3
+#define MESSAGE_RUMOR_FACTOR 16
 #endif
 
 #ifndef MESSAGE_MAX_SIZE
 /** The maximum supported size of the message including a protocol overhead. */
-#define MESSAGE_MAX_SIZE (1024 * 8)
+#define MESSAGE_MAX_SIZE 9216
 #endif
 
 #ifndef MAX_OUTPUT_MESSAGES
 /** The maximum number of unique messages that can be stored in the outbound message queue. */
-#define MAX_OUTPUT_MESSAGES 100
+#define MAX_OUTPUT_MESSAGES 1000
 #endif
 
 #ifndef GOSSIP_TICK_INTERVAL
